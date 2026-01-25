@@ -1,0 +1,60 @@
+type: vertical-stack
+cards:
+  - type: heading
+    heading: "🚰 PUMP CONTROL CENTER"
+
+  # Real-time Gauges
+  - type: grid
+    columns: 2
+    square: false
+    cards:
+      - type: gauge
+        entity: sensor.smart_waterpump_pro_pump_voltage
+        name: Voltage
+        min: 160
+        max: 270
+        needle: true
+        severity:
+          green: 210
+          yellow: 190
+          red: 0
+      - type: gauge
+        entity: sensor.smart_waterpump_pro_pump_amps
+        name: Motor Load (A)
+        max: 15
+        needle: true
+
+  # Power Stats Grid
+  - type: grid
+    columns: 3
+    square: false
+    cards:
+      - type: entity
+        entity: sensor.smart_waterpump_pro_pump_watts
+        name: Power
+      - type: entity
+        entity: sensor.smart_waterpump_pro_pump_total_energy
+        name: Usage (kWh)
+      - type: entity
+        entity: sensor.smart_waterpump_pro_pump_ac_frequency
+        name: Freq (Hz)
+
+  # Control Buttons (Large & Attractive)
+  - type: horizontal-stack
+    cards:
+      - type: tile
+        entity: switch.smart_waterpump_pro_start_pump
+        name: START
+        icon: mdi:play-circle
+        color: green
+      - type: tile
+        entity: switch.smart_waterpump_pro_stop_pump
+        name: STOP
+        icon: mdi:stop-circle
+        color: red
+
+  # Physical Running Confirmation
+  - type: tile
+    entity: binary_sensor.smart_waterpump_pro_pump_running_status
+    name: "Confirmed Running State"
+    color: green

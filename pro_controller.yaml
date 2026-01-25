@@ -1,0 +1,90 @@
+substitutions:
+  name: smart-waterpump-pro
+  friendly_name: Smart Waterpump Pro
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+esp8266:
+  board: d1_mini
+
+logger:
+  baud_rate: 0 # Serial logging must be off for PZEM UART
+
+wifi:
+  networks:
+    - ssid: "YOUR_WIFI_SSID"
+      password: "YOUR_WIFI_PASSWORD"
+  manual_ip:
+    static_ip: 192.168.1.XX
+    gateway: 192.168.1.1
+    subnet: 255.255.255.0
+
+api:
+  encryption:
+    key: "YOUR_ESPHOME_API_KEY"
+
+ota:
+  - platform: esphome
+    password: "YOUR_OTA_PASSWORD"
+
+# PZEM-004T Communication
+uart:
+  rx_pin: D5
+  tx_pin: D6
+  baud_rate: 9600
+
+sensor:
+  - platform: pzemac
+    address: 1
+    voltage:
+      name: "Pump Voltage"
+    current:
+      name: "Pump Amps"
+      id: pump_amps
+      # Safety: Auto-stop if motor runs without water (Dry Run)
+      on_value_range:
+        - below: 1.0 
+          then:
+            - if:
+                condition:
+                  binary_sensor.is_on: pump_running_status
+                then:
+                  - switch.turn_on: relay_stop
+    power:
+      name: "Pump Watts"
+    energy:
+      name: "Pump Total Energy"
+    frequency:
+      name: "Pump AC Frequency"
+
+# Dynamic status using current draw feedback
+binary_sensor:
+  - platform: template
+    name: "Pump Running Status"
+    id: pump_running_status
+    device_class: running
+    lambda: |-
+      return id(pump_amps).state > 0.5;
+
+switch:
+  - platform: gpio
+    pin: D1
+    id: relay_start
+    name: "Start Pump"
+    inverted: true 
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 2s
+      - switch.turn_off: relay_start
+
+  - platform: gpio
+    pin: D2
+    id: relay_stop
+    name: "Stop Pump"
+    inverted: true 
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 2s
+      - switch.turn_off: relay_stop

@@ -1,0 +1,60 @@
+substitutions:
+  name: smart-waterpump
+  friendly_name: Smart Waterpump
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+esp8266:
+  board: d1_mini
+
+logger:
+
+wifi:
+  networks:
+    - ssid: "YOUR_WIFI_SSID_1"
+      password: "YOUR_WIFI_PASSWORD_1"
+      priority: 100
+    - ssid: "YOUR_WIFI_SSID_2"
+      password: "YOUR_WIFI_PASSWORD_2"
+      priority: 50
+  
+  # Manual IP ensures your dashboard doesn't lose connection
+  manual_ip:
+    static_ip: 192.168.1.XX
+    gateway: 192.168.1.1
+    subnet: 255.255.255.0
+
+api:
+  encryption:
+    key: "YOUR_ESPHOME_API_KEY"
+
+ota:
+  - platform: esphome
+    password: "YOUR_OTA_PASSWORD"
+
+switch:
+  # START RELAY (GPIO5 / D1)
+  - platform: gpio
+    pin: D1
+    id: relay_start
+    name: "Start Pump"
+    icon: "mdi:play"
+    inverted: true 
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 2s
+      - switch.turn_off: relay_start
+
+  # STOP RELAY (GPIO4 / D2)
+  - platform: gpio
+    pin: D2
+    id: relay_stop
+    name: "Stop Pump"
+    icon: "mdi:stop"
+    inverted: true 
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 2s
+      - switch.turn_off: relay_stop
