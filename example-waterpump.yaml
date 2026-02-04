@@ -1,0 +1,90 @@
+esphome:
+  name: Home-waterpump
+  friendly_name: Home Waterpump
+
+esp8266:
+  board: d1_mini
+
+logger:
+  baud_rate: 0 # Essential for PZEM communication on UART
+
+wifi:
+  networks:
+    - ssid: "my wifi"
+      password: "mywifi pass"
+      priority: 100
+    - ssid: "ElectroIoT.in"
+      password: "mywifi pass"
+      priority: 50
+  min_auth_mode: WPA2 
+
+api:
+  encryption:
+    key: "my key paste here"
+
+ota:
+  - platform: esphome
+    password: "my ota cde paste here"
+
+uart:
+  rx_pin: D5
+  tx_pin: D6
+  baud_rate: 9600
+
+sensor:
+  - platform: pzemac
+    address: 1
+    voltage:
+      name: "Pump Voltage"
+      id: pump_volt
+    current:
+      name: "Pump Amps"
+      id: pump_amps
+      # DRY RUN PROTECTION: If Amps < 1.0 while motor is 'running', turn it off
+      on_value_range:
+        - below: 1.0
+          then:
+            - if:
+                condition:
+                  binary_sensor.is_on: pump_running_status
+                then:
+                  - switch.turn_on: relay_stop
+    power:
+      name: "Pump Watts"
+    energy:
+      name: "Pump Total Energy"
+    frequency:
+      name: "Pump AC Frequency"
+    update_interval: 2s
+
+# FEEDBACK LOGIC: Confirms motor is physically spinning
+binary_sensor:
+  - platform: template
+    name: "Pump Running Status"
+    id: pump_running_status
+    device_class: running
+    lambda: |-
+      return id(pump_amps).state > 0.5;
+
+switch:
+  # START RELAY (D1)
+  - platform: gpio
+    pin: D1
+    id: relay_start
+    name: "Start Pump"
+    inverted: true 
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 2.5s
+      - switch.turn_off: relay_start
+
+  # STOP RELAY (D2)
+  - platform: gpio
+    pin: D2
+    id: relay_stop
+    name: "Stop Pump"
+    inverted: true 
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      - delay: 2s
+      - switch.turn_off: relay_stop
