@@ -2,7 +2,7 @@
 
 [![ESPHome](https://img.shields.io/badge/ESPHome-2025.12.7-orange?style=for-the-badge&logo=esphome)](https://esphome.io)
 [![Home Assistant](https://img.shields.io/badge/Home_Assistant-Compatible-blue?style=for-the-badge&logo=home-assistant)](https://home-assistant.io)
-[![GitHub Star](https://img.shields.io/github/stars/manoranjan2050/Smart-Submersible-Pump-Controller?style=for-the-badge)](https://github.com/manoranjan2050/Smart-Submersible-Pump-Controller/stargazers)
+[![GitHub Star](https://img.shields.io/github/stars/ElectroIoT/Smart-Submersible-Pump-Controller-ESPHome?style=for-the-badge)](https://github.com/ElectroIoT/Smart-Submersible-Pump-Controller-ESPHome/stargazers)
 
 An advanced IoT solution for single-phase submersible pumps. This project replaces or augments your manual motor starter with a smart, WiFi-enabled controller featuring **Dry-Run Protection**, **Energy Monitoring**, and **Real-time Feedback**.
 
